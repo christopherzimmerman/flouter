@@ -53,3 +53,16 @@ class TestFiles(object):
         # test
         found, *_ = Router(tmpdir.strpath).routes
         assert found.route_url == "/api/"
+
+    def test_file_to_route_named_params(self, tmpdir):
+        """ tests that named parameters are converted into
+        the appropriate route
+        """
+
+        # setup
+        f = tmpdir.mkdir("api").join("_foo.py")
+        f.write(EMPTY_FILE_CONTENT)
+
+        # test
+        found, *_ = Router(tmpdir.strpath).routes
+        assert found.route_url == "/api/<foo>/"

@@ -71,4 +71,10 @@ def _convert_path_to_route(clipped_path, index_name="index.py"):
     swapped_slashes = clipped_path.replace(os.sep, "/")
     escaped_index = re.escape(index_name)
     rgx = "({})$".format(escaped_index)
-    return re.sub(rgx, "", swapped_slashes)
+
+    # steps to do stuff, probably can be optimized
+    removed_index = re.sub(rgx, "", swapped_slashes)
+    inner_links_formatted = re.sub(r"/_([^/]+)/", r"/<\1>/", removed_index)
+    final_link_formatted = re.sub(r"_(.*?).py$", r"<\1>/", inner_links_formatted)
+
+    return final_link_formatted
