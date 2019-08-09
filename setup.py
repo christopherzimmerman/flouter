@@ -7,16 +7,16 @@ from setuptools import setup
 with io.open("README.rst", "rt", encoding="utf8") as f:
     readme = f.read()
 
-with io.open("src/flask_router/__init__.py", "rt", encoding="utf8") as f:
+with io.open("src/flouter/__init__.py", "rt", encoding="utf8") as f:
     version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
 setup(
-    name="flask_router",
+    name="flouter",
     version=version,
-    url="https://github.com/christopherzimmerman/flask_router",
+    url="https://github.com/christopherzimmerman/flouter",
     project_urls={
-        "Code": "https://github.com/christopherzimmerman/flask_router",
-        "Issue tracker": "https://github.com/christopherzimmerman/flask_router/issues",
+        "Code": "https://github.com/christopherzimmerman/flouter",
+        "Issue tracker": "https://github.com/christopherzimmerman/flouter/issues",
     },
     license="BSD-3 Clause",
     author="Chris Zimmerman",

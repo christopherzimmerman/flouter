@@ -1,7 +1,7 @@
-Flask Router
+Flouter
 ============
 
-Flask Router is a convenience add-on for the `Flask`_ library.  It converts a directory structure into valid routes
+Flouter (Flask Router) is a convenience add-on for the `Flask`_ library.  It converts a directory structure into valid routes
 for a Flask application.  This allows developers to quickly layout complex applications, and easily navigate
 to existing code.  This library is under heavy development and may not yet support a feature you need.  If that is
 the case, please submit a feature request so the library can continue to improve.
@@ -14,13 +14,13 @@ Install and update using `pip`_:
 
 .. code-block:: text
 
-    pip install -U flask_router
+    pip install -U flouter
 
 
 Basic Usage
 -----------
 
-Flask Router will convert the following ``routes`` directory structure...
+Flouter will convert the following ``routes`` directory structure...
 
 .. code-block:: text
 

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-    flask_router
+    flouter
     ~~~~~
-    
+
     Convenient routing for a flask application
-    
+
     :copyright: 2019 Chris Zimmerman
     :license: BSD-3-Clause
 """
