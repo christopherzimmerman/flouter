@@ -11,7 +11,7 @@ with io.open("src/flask_router/__init__.py", "rt", encoding="utf8") as f:
     version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
 setup(
-    name="Flask Router",
+    name="flask_router",
     version=version,
     url="https://github.com/christopherzimmerman/flask_router",
     project_urls={
@@ -26,7 +26,7 @@ setup(
     description="Convenient routing for a flask application",
     long_description=readme,
     classifiers=[
-        "Development Status :: 1 - Development/Unstable",
+        "Development Status :: 1 - Planning",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
@@ -42,18 +42,9 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     python_requires=">=3.5",
-    install_requires=[
-        "flask>=1.1"
-    ],
+    install_requires=["flask>=1.1"],
     extras_require={
-        "dev": [
-            "pytest",
-            "coverage",
-            "sphinx",
-        ],
-        "docs": [
-            "sphinx",
-            "numpydoc",
-        ],
+        "dev": ["pytest", "coverage", "sphinx"],
+        "docs": ["sphinx", "numpydoc"],
     },
 )
