@@ -9,12 +9,12 @@
     :license: BSD-3-Clause
 """
 import glob
+import importlib.util
 import os
 import re
-import importlib.util
 
 
-_ALLOWED_METHODS = {'get', 'post', 'delete', 'put', 'head'}
+_ALLOWED_METHODS = {"get", "post", "delete", "put", "head"}
 
 
 def _find_files_from_path(path):
@@ -123,5 +123,4 @@ def _convert_path_to_function(clipped_path):
     fn : str -- function name
     """
     components = [comp for comp in clipped_path.split(os.sep) if comp]
-    return '_'.join(components)[:-3]
-
+    return "_".join(components)[:-3]

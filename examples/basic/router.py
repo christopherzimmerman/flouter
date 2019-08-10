@@ -22,10 +22,9 @@ from flouter import Router
 
 app = Flask(__name__)
 
-route_dir = os.getcwd() + '/routes/'
+route_dir = os.getcwd() + "/routes/"
 router = Router(route_dir)
 
 router.register_routes(app)
 
 app.run()
-

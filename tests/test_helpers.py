@@ -97,10 +97,10 @@ class TestFiles(object):
 
         # test
         found, *_ = Router(tmpdir.strpath).routes
-        assert 'get' in found.methods
+        assert "get" in found.methods
 
     def test_methods_imported_from_file_callable(self, tmpdir):
-        """tests that imported methods can be called and return
+        """tests that imported functions can be called and return
         expected result"""
 
         # setup
@@ -109,7 +109,7 @@ class TestFiles(object):
 
         # test
         found, *_ = Router(tmpdir.strpath).routes
-        assert found.methods['get']() == 'Hello World'
+        assert found.methods["get"]() == "Hello World"
 
     def test_methods_have_proper_name(self, tmpdir):
         """tests that function names are properly related to
@@ -124,4 +124,4 @@ class TestFiles(object):
 
         print(found.function.__name__)
 
-        assert found.function.__name__ == 'api_index'
+        assert found.function.__name__ == "api_index"

@@ -11,14 +11,14 @@
 """
 import os
 
-from flask import request
 from flask import jsonify
+from flask import request
 
+from .helpers import _convert_path_to_function
 from .helpers import _convert_path_to_route
+from .helpers import _extract_methods_from_route
 from .helpers import _find_files_from_path
 from .helpers import _remove_base_path_from_file
-from .helpers import _extract_methods_from_route
-from .helpers import _convert_path_to_function
 from .logging import logger
 
 
@@ -64,10 +64,12 @@ class BaseRoute(object):
         -------
         fn : wrapped function
         """
+
         def outer(fn_dict):
             """Returns a function correctly named for a route
             while also properly routing requests where they
             need to go"""
+
             def inner(**kwargs):
                 """Simple wrapper function to handle route
                 navigation
@@ -156,4 +158,4 @@ class Router(object):
         for route in self.routes:
             fn = route.function
             app.add_url_rule(route.route_url, fn.__name__, fn)
-            logger.debug('Adding {} to application'.format(route.route_url))
+            logger.debug("Adding {} to application".format(route.route_url))
