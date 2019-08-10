@@ -8,5 +8,6 @@
     :copyright: 2019 Chris Zimmerman
     :license: BSD-3-Clause
 """
+from .router import Router
 
-__version__ = "0.0.1.dev"
+__version__ = "0.0.2.dev"

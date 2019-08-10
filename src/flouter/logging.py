@@ -15,3 +15,5 @@ default_handler = logging.StreamHandler(sys.stderr)
 default_handler.setFormatter(
     logging.Formatter("[%(asctime)s] %(levelname)s in %(module)s: %(message)s")
 )
+
+logger = logging.Logger(default_handler)

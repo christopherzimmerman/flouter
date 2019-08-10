@@ -12,6 +12,12 @@ from flouter.router import Router
 
 EMPTY_FILE_CONTENT = "# empty"
 
+GET_FILE_CONTENT = """
+# simple get
+def get():
+    return 'Hello World'
+"""
+
 
 class TestFiles(object):
     """
@@ -66,3 +72,56 @@ class TestFiles(object):
         # test
         found, *_ = Router(tmpdir.strpath).routes
         assert found.route_url == "/api/<foo>/"
+
+    def test_file_to_route_nested_named_params(self, tmpdir):
+        """ tests that nested routes are handled appropriately
+        by the parser
+        """
+
+        # setup
+        f = tmpdir.mkdir("api").mkdir("_foo").join("_bar.py")
+        f.write(EMPTY_FILE_CONTENT)
+
+        # test
+        found, *_ = Router(tmpdir.strpath).routes
+        assert found.route_url == "/api/<foo>/<bar>/"
+
+    def test_methods_imported_from_file(self, tmpdir):
+        """tests that methods can be imported from a found
+        file path
+        """
+
+        # setup
+        f = tmpdir.mkdir("api").join("index.py")
+        f.write(GET_FILE_CONTENT)
+
+        # test
+        found, *_ = Router(tmpdir.strpath).routes
+        assert 'get' in found.methods
+
+    def test_methods_imported_from_file_callable(self, tmpdir):
+        """tests that imported methods can be called and return
+        expected result"""
+
+        # setup
+        f = tmpdir.mkdir("api").join("index.py")
+        f.write(GET_FILE_CONTENT)
+
+        # test
+        found, *_ = Router(tmpdir.strpath).routes
+        assert found.methods['get']() == 'Hello World'
+
+    def test_methods_have_proper_name(self, tmpdir):
+        """tests that function names are properly related to
+        api route name"""
+
+        # setup
+        f = tmpdir.mkdir("api").join("index.py")
+        f.write(GET_FILE_CONTENT)
+
+        # test
+        found, *_ = Router(tmpdir.strpath).routes
+
+        print(found.function.__name__)
+
+        assert found.function.__name__ == 'api_index'

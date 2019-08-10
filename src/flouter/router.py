@@ -11,9 +11,15 @@
 """
 import os
 
+from flask import request
+from flask import jsonify
+
 from .helpers import _convert_path_to_route
 from .helpers import _find_files_from_path
 from .helpers import _remove_base_path_from_file
+from .helpers import _extract_methods_from_route
+from .helpers import _convert_path_to_function
+from .logging import logger
 
 
 class BaseRoute(object):
@@ -32,6 +38,7 @@ class BaseRoute(object):
     def __init__(self, filename, base_path):
         self.filename = filename
         self.base_path = base_path
+        self.methods = _extract_methods_from_route(self.filename)
 
     @property
     def clipped_path(self):
@@ -40,6 +47,40 @@ class BaseRoute(object):
     @property
     def route_url(self):
         return _convert_path_to_route(self.clipped_path)
+
+    @property
+    def function_name(self):
+        return _convert_path_to_function(self.clipped_path)
+
+    @property
+    def function(self):
+        """
+        Computes a function for a given route, that will be passed
+        into a flask app rule.  This will need considerable work
+        to ensure that all route decorators can be passed through
+        this function and have it work correctly
+
+        Returns
+        -------
+        fn : wrapped function
+        """
+        def outer(fn_dict):
+            """Returns a function correctly named for a route
+            while also properly routing requests where they
+            need to go"""
+            def inner(**kwargs):
+                """Simple wrapper function to handle route
+                navigation
+                """
+                fn = fn_dict.get(request.method.lower())
+
+                if fn is not None:
+                    return jsonify(fn(**kwargs))
+
+            inner.__name__ = self.function_name
+            return inner
+
+        return outer(self.methods)
 
 
 class Router(object):
@@ -96,3 +137,23 @@ class Router(object):
             BaseRoute(file, self.norm_path)
             for file in _find_files_from_path(self.norm_path)
         ]
+
+    def register_routes(self, app):
+        """
+        Adds routes as app rules to a flask application.
+        Requires a flask application to be initialized
+        before it will be able to add routes
+
+        Parameters
+        ----------
+        app : a flask application
+
+        Returns
+        -------
+        None -- adds routes directly to the application
+        """
+
+        for route in self.routes:
+            fn = route.function
+            app.add_url_rule(route.route_url, fn.__name__, fn)
+            logger.debug('Adding {} to application'.format(route.route_url))

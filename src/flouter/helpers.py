@@ -11,6 +11,10 @@
 import glob
 import os
 import re
+import importlib.util
+
+
+_ALLOWED_METHODS = {'get', 'post', 'delete', 'put', 'head'}
 
 
 def _find_files_from_path(path):
@@ -78,3 +82,46 @@ def _convert_path_to_route(clipped_path, index_name="index.py"):
     final_link_formatted = re.sub(r"_(.*?).py$", r"<\1>/", inner_links_formatted)
 
     return final_link_formatted
+
+
+def _extract_methods_from_route(path):
+    """
+    Extract methods from a given path.  This imports
+    an absolute path, although I don't see how this
+    is any more dangerous than executing other code
+    since you define the path that is imported
+
+    Parameters
+    ----------
+    path : str
+        absolute path to import
+
+    Returns
+    -------
+    d : dictionary of RESTful methods
+
+    """
+    spec = importlib.util.spec_from_file_location("module", path)
+    module = importlib.util.module_from_spec(spec)
+
+    spec.loader.exec_module(module)
+
+    fns = set(dir(module)) & _ALLOWED_METHODS
+
+    return {fn: getattr(module, fn) for fn in fns}
+
+
+def _convert_path_to_function(clipped_path):
+    """
+    Parameters
+    ----------
+    clipped_path : str
+        api route with absolute path clipped
+
+    Returns
+    -------
+    fn : str -- function name
+    """
+    components = [comp for comp in clipped_path.split(os.sep) if comp]
+    return '_'.join(components)[:-3]
+
