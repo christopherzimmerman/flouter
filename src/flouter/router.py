@@ -121,7 +121,7 @@ class Router(object):
         if route_params is None:
             self.route_params = {"request": request}
         else:
-            self.route_params = request
+            self.route_params = route_params
 
         # computed paths
         self.routes = self.compute_api_structure()
