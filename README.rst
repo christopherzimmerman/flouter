@@ -53,6 +53,56 @@ is passed to the route.
          return request.json
 
 
+An example usage of this library is included in `examples/basic`_
+
+.. code-block:: python
+
+    # main.py
+    import os
+
+    from flask import Flask
+    from src.flouter import Router
+
+    app = Flask(__name__)
+
+    route_dir = os.getcwd() + "/routes/"
+    router = Router(route_dir)
+
+    router.register_routes(app)
+
+    app.run()
+
+A `Router` object also allows ``route_params`` to be defined, which allow methods to access
+important elements of an application without having to explicitly import these into
+every single file, which could quickly become annoying.  The default value for this dictionary
+contains only the ``flask.request`` object, which you can access in any function by adding
+the ``request`` kwarg.  However, you can extend this to pass in any important variables you
+may have.
+
+.. code-block:: python
+
+    # main.py
+
+    d = dict(
+        my_constant=10,
+    )
+
+    router = Router(directory, route_params=d)
+
+Which enables ``my_constant`` to be passed to any route child function.
+
+.. code-block:: python
+
+    # /api/index.py
+
+    def get(my_constant):
+        return my_constant
+
+
+
+
+
 
 .. _Flask: https://www.palletsprojects.com/p/flask/
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
+.. _examples/basic: examples/basic
