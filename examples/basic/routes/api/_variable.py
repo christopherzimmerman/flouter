@@ -9,4 +9,4 @@ it in for all methods, it will be ignored if you leave it out
 
 
 def get(variable):
-    return "The variable is {}".format(variable)
+    return {"variable": variable}

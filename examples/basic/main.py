@@ -18,7 +18,7 @@ GET /api/<variable> will return "The variable is <variable>"
 import os
 
 from flask import Flask
-from flouter import Router
+from src.flouter import Router
 
 app = Flask(__name__)
 

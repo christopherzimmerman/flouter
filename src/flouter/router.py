@@ -13,13 +13,13 @@ import os
 
 from flask import jsonify
 from flask import request
+from flask.views import MethodView
 
 from .helpers import _convert_path_to_function
 from .helpers import _convert_path_to_route
 from .helpers import _extract_methods_from_route
 from .helpers import _find_files_from_path
 from .helpers import _remove_base_path_from_file
-from .logging import logger
 
 
 class BaseRoute(object):
@@ -52,8 +52,29 @@ class BaseRoute(object):
     def function_name(self):
         return _convert_path_to_function(self.clipped_path)
 
-    @property
-    def function(self):
+    def _wraps_fn(self, fn, params):
+        """
+        Parameters
+        ----------
+        fn
+        params
+
+        Returns
+        -------
+
+        """
+
+        def wrapped(**kwargs):
+            vn = set(fn.__code__.co_varnames)
+            for k in params.keys() & vn:
+                kwargs[k] = params.get(k)
+            return jsonify(fn(**kwargs))
+
+        wrapped.__name__ = "{}{}".format(self.function_name, fn.__name__)
+
+        return wrapped
+
+    def function(self, params):
         """
         Computes a function for a given route, that will be passed
         into a flask app rule.  This will need considerable work
@@ -65,24 +86,14 @@ class BaseRoute(object):
         fn : wrapped function
         """
 
-        def outer(fn_dict):
-            """Returns a function correctly named for a route
-            while also properly routing requests where they
-            need to go"""
+        class Dynamic(MethodView):
+            pass
 
-            def inner(**kwargs):
-                """Simple wrapper function to handle route
-                navigation
-                """
-                fn = fn_dict.get(request.method.lower())
+        for name, fn in self.methods.items():
+            f = self._wraps_fn(fn, params)
+            setattr(Dynamic, name, staticmethod(f))
 
-                if fn is not None:
-                    return jsonify(fn(**kwargs))
-
-            inner.__name__ = self.function_name
-            return inner
-
-        return outer(self.methods)
+        return Dynamic
 
 
 class Router(object):
@@ -103,10 +114,14 @@ class Router(object):
         not have it break existing code
     """
 
-    def __init__(self, path, absolute=False):
+    def __init__(self, path, route_params=None):
         # setting initial values
         self.path = path
-        self.absolute = absolute
+
+        if route_params is None:
+            self.route_params = {"request": request}
+        else:
+            self.route_params = request
 
         # computed paths
         self.routes = self.compute_api_structure()
@@ -156,6 +171,5 @@ class Router(object):
         """
 
         for route in self.routes:
-            fn = route.function
-            app.add_url_rule(route.route_url, fn.__name__, fn)
-            logger.debug("Adding {} to application".format(route.route_url))
+            view = route.function(self.route_params).as_view(route.function_name)
+            app.add_url_rule(route.route_url, view_func=view)
