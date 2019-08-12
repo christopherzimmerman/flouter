@@ -81,7 +81,9 @@ def _convert_path_to_route(clipped_path, index_name="index.py"):
     inner_links_formatted = re.sub(r"/_([^/]+)/", r"/<\1>/", removed_index)
     final_link_formatted = re.sub(r"_(.*?).py$", r"<\1>/", inner_links_formatted)
 
-    return final_link_formatted
+    remove_trailing_py = re.sub(r".py$", "/", final_link_formatted)
+
+    return remove_trailing_py
 
 
 def _extract_methods_from_route(path):
