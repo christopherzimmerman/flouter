@@ -78,6 +78,7 @@ class BaseRoute(object):
         """
         Computes a function for a given route, that will be passed
         into a flask app rule.  This will need considerable work
+        into a flask app rule.  This will need considerable work
         to ensure that all route decorators can be passed through
         this function and have it work correctly
 
@@ -174,4 +175,8 @@ class Router(object):
 
         for route in self.routes:
             view = route.function(self.route_params).as_view(route.function_name)
-            app.add_url_rule(route.route_url, view_func=view)
+            app.add_url_rule(
+                route.route_url,
+                view_func=view,
+                methods=[m.upper() for m in route.methods],
+            )
