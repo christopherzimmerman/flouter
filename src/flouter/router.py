@@ -123,6 +123,8 @@ class Router(object):
         else:
             self.route_params = route_params
 
+        self.route_params["request"] = request
+
         # computed paths
         self.routes = self.compute_api_structure()
 
