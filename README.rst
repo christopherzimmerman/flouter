@@ -50,7 +50,7 @@ is passed to the route.
 
      def post(request):
          # returns are turned into valid responses by the library
-         return request
+         return request.json
 
 
 
