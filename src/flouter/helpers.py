@@ -79,7 +79,7 @@ def _convert_path_to_route(clipped_path, index_name="index.py"):
     # steps to do stuff, probably can be optimized
     removed_index = re.sub(rgx, "", swapped_slashes)
     inner_links_formatted = re.sub(r"/_([^/]+)/", r"/<\1>/", removed_index)
-    final_link_formatted = re.sub(r"_(.*?).py$", r"<\1>/", inner_links_formatted)
+    final_link_formatted = re.sub(r"/_(.*?).py$", r"/<\1>/", inner_links_formatted)
 
     remove_trailing_py = re.sub(r".py$", "/", final_link_formatted)
 
