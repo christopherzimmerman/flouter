@@ -86,6 +86,30 @@ class TestFiles(object):
         found, *_ = Router(tmpdir.strpath).routes
         assert found.route_url == "/api/<foo>/<bar>/"
 
+    def test_file_to_route_underscore_in_route(self, tmpdir):
+        """ tests that underscore file names are not treated
+        as route parameters"""
+
+        # setup
+        f = tmpdir.mkdir("api").join("foo_bar.py")
+        f.write(EMPTY_FILE_CONTENT)
+
+        # test
+        found, *_ = Router(tmpdir.strpath).routes
+        assert found.route_url == "/api/foo_bar/"
+
+    def test_file_to_route_underscore_route_param(self, tmpdir):
+        """ tests that underscore file names can still be treated
+        as route parameters"""
+
+        # setup
+        f = tmpdir.mkdir("api").join("_foo_bar.py")
+        f.write(EMPTY_FILE_CONTENT)
+
+        # test
+        found, *_ = Router(tmpdir.strpath).routes
+        assert found.route_url == "/api/<foo_bar>/"
+
     def test_methods_imported_from_file(self, tmpdir):
         """tests that methods can be imported from a found
         file path
@@ -110,18 +134,3 @@ class TestFiles(object):
         # test
         found, *_ = Router(tmpdir.strpath).routes
         assert found.methods["get"]() == "Hello World"
-
-    def test_methods_have_proper_name(self, tmpdir):
-        """tests that function names are properly related to
-        api route name"""
-
-        # setup
-        f = tmpdir.mkdir("api").join("index.py")
-        f.write(GET_FILE_CONTENT)
-
-        # test
-        found, *_ = Router(tmpdir.strpath).routes
-
-        print(found.function.__name__)
-
-        assert found.function.__name__ == "api_index"
