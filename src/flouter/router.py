@@ -15,6 +15,9 @@ from flask import jsonify
 from flask import request
 from flask.views import MethodView
 
+from trimport import FunctionPathFactory
+from trimport import FunctionPath
+
 from .helpers import _convert_path_to_function
 from .helpers import _convert_path_to_route
 from .helpers import _extract_methods_from_route
@@ -22,7 +25,7 @@ from .helpers import _find_files_from_path
 from .helpers import _remove_base_path_from_file
 
 
-class BaseRoute(object):
+class BaseRoute(FunctionPath):
     """ Takes an arbitrary filename and wraps convenient
     functions to convert it to valid routes/files/functions
     for Router to use
@@ -35,14 +38,8 @@ class BaseRoute(object):
         base_path to be clipped for route generation
     """
 
-    def __init__(self, filename, base_path):
-        self.filename = filename
-        self.base_path = base_path
-        self.methods = _extract_methods_from_route(self.filename)
-
-    @property
-    def clipped_path(self):
-        return _remove_base_path_from_file(self.base_path, self.filename)
+    def __init__(self, filename, base_path, allowed_methods):
+        super().__init__(filename, base_path, allowed_methods)
 
     @property
     def route_url(self):
@@ -97,7 +94,7 @@ class BaseRoute(object):
         return Dynamic
 
 
-class Router(object):
+class Router(FunctionPathFactory):
     """ Takes a path and allows routes to be trivially
     registered on an application based on directory structure
     and RESTfully-named functions.  Supports route params,
@@ -116,18 +113,15 @@ class Router(object):
     """
 
     def __init__(self, path, route_params=None):
-        # setting initial values
-        self.path = path
+        #
+        allowed_methods = {'get', 'post', 'head', 'delete', 'put'}
+        super().__init__(path, allowed_methods=allowed_methods)
 
         if route_params is None:
             self.route_params = {"request": request}
         else:
             self.route_params = route_params
-
         self.route_params["request"] = request
-
-        # computed paths
-        self.routes = self.compute_api_structure()
 
     @property
     def norm_path(self):
@@ -140,9 +134,9 @@ class Router(object):
         -------
         n : normalized path string
         """
-        return os.path.normpath(self.path)
+        return os.path.normpath(self._path)
 
-    def compute_api_structure(self):
+    def _compute_structure(self, allowed_methods=None):
         """uses a helper function to find files
         from a given path.  Currently uses glob
         in virtually a one line function, but in
@@ -154,7 +148,7 @@ class Router(object):
         m : [BaseRoute] -- List of base routes for each found file
         """
         return [
-            BaseRoute(file, self.norm_path)
+            BaseRoute(file, self.norm_path, allowed_methods)
             for file in _find_files_from_path(self.norm_path)
         ]
 
@@ -173,7 +167,7 @@ class Router(object):
         None -- adds routes directly to the application
         """
 
-        for route in self.routes:
+        for route in self.function_paths:
             view = route.function(self.route_params).as_view(route.function_name)
             app.add_url_rule(
                 route.route_url,

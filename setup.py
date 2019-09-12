@@ -42,7 +42,7 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     python_requires=">=3.5",
-    install_requires=["flask>=1.1"],
+    install_requires=["flask>=1.1", "trimport"],
     extras_require={
         "dev": ["pytest", "coverage", "sphinx"],
         "docs": ["sphinx", "numpydoc"],
